@@ -2,23 +2,24 @@ const Engine = Matter.Engine;
 const World= Matter.World;
 const Bodies = Matter.Bodies;
 const Constraint = Matter.Constraint;
-
 var engine, world;
 var box1, pig1,pig3;
 var backgroundImg,platform;
 var bird, slingshot;
-
+var bg= "sprites/bg.png";
 var gameState = "onSling";
+var score;
 
 function preload() {
-    backgroundImg = loadImage("sprites/bg.png");
+    
+    getBackground();
 }
 
 function setup(){
     var canvas = createCanvas(1200,400);
     engine = Engine.create();
     world = engine.world;
-
+    score=0;
 
     ground = new Ground(600,height,1200,20);
     platform = new Ground(150, 305, 300, 170);
@@ -45,7 +46,16 @@ function setup(){
 }
 
 function draw(){
+    if(backgroundImg){
     background(backgroundImg);
+    }
+    else{
+    background(0);
+    }
+    noStroke();
+    textSize(35);
+    fill("white");
+    text("Score: "+score,width-300,50);
     Engine.update(engine);
     //strokeWeight(4);
     box1.display();
@@ -66,7 +76,9 @@ function draw(){
     bird.display();
     platform.display();
     //log6.display();
-    slingshot.display();    
+    slingshot.display();  
+    pig1.score();
+    pig3.score();    
 }
 
 function mouseDragged(){
@@ -85,4 +97,19 @@ function keyPressed(){
     if(keyCode === 32){
        // slingshot.attach(bird.body);
     }
+}
+
+async function getBackground(){
+    var response=await fetch("http://worldclockapi.com/api/json/est/now");
+    var responseJSON=await response.json();
+    var dateTime=responseJSON.currentDateTime;
+    var hour=dateTime.slice(11,13);
+    console.log(hour);
+    if(hour>=06 && hour<19){
+    bg="sprites/bg.png"
+    }
+    else{
+    bg="sprites/bg2.jpg"
+    }
+    backgroundImg = loadImage(bg);
 }
